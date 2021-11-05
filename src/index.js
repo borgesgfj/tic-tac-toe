@@ -22,21 +22,15 @@ class Board extends React.Component {
   render() {
     return (
       <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
+        {Array(3)
+          .fill(null)
+          .map((_, row) => (
+            <div className="board-row">
+              {Array(3)
+                .fill(null)
+                .map((_, col) => this.renderSquare(col + row * 3))}
+            </div>
+          ))}
       </div>
     );
   }
@@ -49,6 +43,8 @@ class Game extends React.Component {
       history: [
         {
           squares: Array(9).fill(null),
+          col: null,
+          row: null
         },
       ],
       stepNumber: 0,
@@ -67,6 +63,8 @@ class Game extends React.Component {
       history: history.concat([
         {
           squares: squares,
+          col: i % 3,
+          row: Math.floor(i / 3)
         },
       ]),
       stepNumber: history.length,
@@ -83,13 +81,14 @@ class Game extends React.Component {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
-    const moves = history.map((step, move) => {
-      const desc = move // Não entendi esse trecho, pois move não é booleano e está dentro do ternário.
-        ? `Go to move # ${move}`
+    const moves = history.map((historyPoint, move) => {
+      const {col, row} = historyPoint
+      const moveDescription = move
+        ? `Go to move # ${move}.(column: ${col}, row: ${row})`
         : `Go to game start`;
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button onClick={() => this.jumpTo(move)}>{moveDescription}</button>
         </li>
       );
     });
